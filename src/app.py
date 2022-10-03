@@ -13,12 +13,12 @@ def main(event, context):
     }
 
 
-@app.get("var/name")
+@app.get("var/{name}")
 def get_test(name='default'):
     return {
         "statusCode": 200,
         'headers': {"content-type": "application/json"},
-        "body": json.dumps({"var": 1}),
+        "body": json.dumps({"var": name}),
     }
 
 
@@ -32,7 +32,7 @@ def get_test(op1=0):
 
 
 @app.post("test/post")
-def get_test(op1=0):
+def post_test(op1=0):
     return {
         "statusCode": 200,
         'headers': {"content-type": "application/json"},
@@ -41,7 +41,7 @@ def get_test(op1=0):
 
 
 @app.put("test/put")
-def get_test(op1=0):
+def put_test(op1=0):
     return {
         "statusCode": 200,
         'headers': {"content-type": "application/json"},
@@ -50,7 +50,7 @@ def get_test(op1=0):
 
 
 @app.delete("test/delete")
-def get_test(op1=0):
+def delete_test(op1=0):
     return {
         "statusCode": 200,
         'headers': {"content-type": "application/json"},

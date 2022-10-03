@@ -1,21 +1,27 @@
-from inspect import signature
 import store
+import re
 
 
 class AWSomeApp:
     def __init__(self):
         self.__main = None
-        self.__routes = {'GET': {}, 'POST': {}, 'PUT': {}, 'DELETE': {}}
+        self.__routes = []
 
     def __call__(self, event, context):
         store.init()
         main_response = self.__main(event, context)
         print(f"{self.__routes=}")
         response = None
-        route = event['pathParameters']['proxy']
-        method = event['httpMethod']
-        if route in self.__routes[method]:
-            response = self.__routes[method][route]()
+        request_route = f"{event['httpMethod']} {event['pathParameters']['proxy']}"
+        print(f"{request_route=}")
+        for route in self.__routes:
+            match = re.search(re.compile(route['route']), request_route)
+            if match:
+                print(f"Found route:{route['route']}")
+                params = match.groupdict()
+                print(f"{params=}")
+                response = route['callback'](**params)
+                break
         return response or main_response
 
     def main(self, func):
@@ -46,8 +52,10 @@ class AWSomeApp:
         return decorator
 
     def __add_route(self, method: str, route: str, callback):
-        func = signature(callback)
-        params = list(func.parameters)
-        print(f"{params=}")
-        # TODO implement : https://github.com/marianocarrazana/rouge/blob/85b2279089949d69363021c0d039063a2f23d242/lib/router.php#L25
-        self.__routes[method][route] = callback
+        regexp = route.replace('/', '/')
+        print(f"{regexp=}")
+        with_names = re.sub(r'{([^\/:]+)(:[^\/]*)?}',
+                            '(?P<\\1>[^\/]+)', regexp)
+        final_route = f"^{method} {with_names}$"
+        print(f"{final_route=}")
+        self.__routes.append({'route': final_route, 'callback': callback})
