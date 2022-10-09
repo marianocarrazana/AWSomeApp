@@ -1,5 +1,5 @@
 import json
-from awsome_app import AWSomeApp, store
+from awsome_app import AWSomeApp, store, GithubHash, UUID
 
 app = AWSomeApp()
 
@@ -13,12 +13,12 @@ def main(event, context):
     }
 
 
-@app.get("var/{name}")
-def get_test(name='default'):
+@app.get("var/{name}/{other_var}")
+def get_test(name:GithubHash, other_var: UUID):
     return {
         "statusCode": 200,
         'headers': {"content-type": "application/json"},
-        "body": json.dumps({"var": name}),
+        "body": json.dumps({"var": str(name)}),
     }
 
 

@@ -1,5 +1,8 @@
 import store
 import re
+from inspect import signature, _empty
+from uuid import UUID
+from custom_types import GithubHash
 
 
 class AWSomeApp:
@@ -20,8 +23,42 @@ class AWSomeApp:
                 print(f"Found route:{route['route']}")
                 params = match.groupdict()
                 print(f"{params=}")
-                response = route['callback'](**params)
-                break
+                sig = signature(route['callback'])
+                print(f"{sig=}")
+                callback_params = sig.parameters.values()
+                print(f"{callback_params=}")
+                # print(f"{sig.parameters=}")
+                matchs = 0
+                for param in callback_params:
+                    print(f"{param.annotation=}")
+                    print(f"{param.name=}")
+                    try:
+                        value = match.group(param.name)
+                        
+                    except IndexError:
+                        # Unknown param in function declaration
+                        print("--------Index error---------")
+                        break
+                    except:
+                        print("Unknown error")
+                        break
+                    value = self.type_converter(value)
+                    print(f"{value=}")
+                    print(f"{type(value)=}")
+                    print(f"{param.annotation==_empty=}")
+                    if param.annotation==_empty:
+                        is_instance = True
+                    else:
+                        is_instance = isinstance(value, param.annotation)
+                    print(f"{is_instance=}")
+                    params[param.name] = value
+                    if is_instance:
+                        matchs += 1
+                print(f"{params=}")
+                print(f"{len(callback_params)=} {matchs=}")
+                if len(callback_params) == matchs:
+                    response = route['callback'](**params)
+                    break
         return response or main_response
 
     def main(self, func):
@@ -59,3 +96,17 @@ class AWSomeApp:
         final_route = f"^{method} {with_names}$"
         print(f"{final_route=}")
         self.__routes.append({'route': final_route, 'callback': callback})
+
+    @staticmethod
+    def type_converter(word: str):
+        if re.match(r'^(-|\+)?\d+$', word):  # is int
+            return int(word)
+        elif re.match(r'^(\+|-)?\d*\.\d+$', word):  # is float
+            return float(word)
+        elif re.match(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', word, re.IGNORECASE):  # is a uuid
+            return UUID(word)
+        try:  # is github hash
+            hash_obj = GithubHash(word)
+            return hash_obj
+        except:  # is a string i guess?
+            return word
