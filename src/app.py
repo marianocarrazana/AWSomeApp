@@ -1,5 +1,8 @@
 import json
-from awsome_app import AWSomeApp, store, GithubHash, UUID
+from uuid import UUID
+
+from awsomelib import AWSomeApp
+from awsomelib.custom_types import GithubHash
 
 app = AWSomeApp()
 
@@ -8,25 +11,25 @@ app = AWSomeApp()
 def main(event, context):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps(event),
     }
 
 
 @app.get("var/{name}/{other_var}")
-def get_test(name:GithubHash, other_var: UUID):
+def get_test(name: GithubHash, other_var: UUID):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps({"var": str(name)}),
     }
 
 
 @app.get("test/get")
-def get_test(op1=0):
+def get_test2(op1=0):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps({"get": True}),
     }
 
@@ -35,7 +38,7 @@ def get_test(op1=0):
 def post_test(op1=0):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps({"post": True}),
     }
 
@@ -44,7 +47,7 @@ def post_test(op1=0):
 def put_test(op1=0):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps({"put": True}),
     }
 
@@ -53,6 +56,6 @@ def put_test(op1=0):
 def delete_test(op1=0):
     return {
         "statusCode": 200,
-        'headers': {"content-type": "application/json"},
+        "headers": {"content-type": "application/json"},
         "body": json.dumps({"delete": True}),
     }
