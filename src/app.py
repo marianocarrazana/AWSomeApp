@@ -2,7 +2,6 @@ import json
 from uuid import UUID
 
 from awsomelib import AWSomeApp
-from awsomelib.custom_types import GithubHash
 
 app = AWSomeApp()
 
@@ -16,12 +15,12 @@ def main(event, context):
     }
 
 
-@app.get("var/{name}/{other_var}")
-def get_test(name: GithubHash, other_var: UUID):
+@app.get("var/{uuid_var}")
+def get_test(uuid_param: UUID):
     return {
         "statusCode": 200,
         "headers": {"content-type": "application/json"},
-        "body": json.dumps({"var": str(name)}),
+        "body": json.dumps({"var": str(uuid_param)}),
     }
 
 

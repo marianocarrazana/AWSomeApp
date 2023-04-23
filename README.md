@@ -8,7 +8,7 @@
 
 ## Run local server
 
-`sam local start-api`
+`sam build && sam local start-api`
 
 Access on <https://127.0.0.1:3000>
 
